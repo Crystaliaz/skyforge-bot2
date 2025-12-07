@@ -2,15 +2,15 @@
   "bot-account": {
     "username": "Skyforge",
     "password": "",
-    "type": "offline"
+    "type": "cracked"
   },
 
   "server": {
     "ip": "SKYFORGE-YdkR.aternos.me",
     "port": 30545,
-    "version": "1.12.1"
+    "version": false
   },
-  
+
   "position": {
     "enabled": false,
     "x": 0,
@@ -23,23 +23,18 @@
       "enabled": false,
       "password": ""
     },
-
     "anti-afk": {
       "enabled": true,
       "sneak": true
     },
-
     "chat-messages": {
       "enabled": true,
       "repeat": true,
       "repeat-delay": 1800,
-      "messages": [
-        "This message will be sent every 30 minutes"
-      ]
+      "messages": ["This message will be sent every 30 minutes"]
     },
-
     "chat-log": true,
     "auto-reconnect": true,
-    "auto-recconect-delay": 5000
+    "auto-reconnect-delay": 5000
   }
 }
