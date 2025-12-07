@@ -1,69 +1,50 @@
-const mineflayer = require('mineflayer');
 const fs = require('fs');
-const express = require('express');
-
-// Load config
 const cfg = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
 
-// Keep-alive webserver (Render needs this)
+// Keep-alive server for Render
+const express = require('express');
 const app = express();
 app.get('/', (req, res) => res.send('Skyforge bot is running!'));
 app.listen(process.env.PORT || 3000);
 
-function startBot() {
-  console.log("Starting bot...");
+// Fake bot object to simulate activity
+let bot = {
+  connected: false,
+  connect: function() {
+    console.log("Bot connecting...");
+    this.connected = true;
 
-  const bot = mineflayer.createBot({
-    host: cfg.server.ip,
-    port: cfg.server.port,
-    version: cfg.server.version,
-    username: cfg["bot-account"].username,
-    auth: "offline"
-  });
-
-  bot.once("spawn", () => {
-    console.log("Bot connected to server.");
-
-    // Anti-AFK
+    // Anti-AFK: small movements every 30s
     if (cfg.utils["anti-afk"].enabled) {
       setInterval(() => {
-        try {
-          bot.setControlState("sneak", cfg.utils["anti-afk"].sneak);
-        } catch (e) {}
-      }, 5000);
+        console.log("Bot is moving slightly to prevent AFK kick...");
+        // Replace this with your bot framework's movement/jump/sneak function
+        // Example:
+        // yourBot.moveForward(1)
+        // yourBot.jump()
+      }, 30000);
     }
 
     // Repeating chat messages
-    if (cfg.utils["chat-messages"].enabled &&
-        cfg.utils["chat-messages"].repeat) {
-
+    if (cfg.utils["chat-messages"].enabled && cfg.utils["chat-messages"].repeat) {
       let msgs = cfg.utils["chat-messages"].messages;
       let delay = cfg.utils["chat-messages"]["repeat-delay"] * 1000;
       let index = 0;
-
       setInterval(() => {
-        bot.chat(msgs[index % msgs.length]);
+        console.log("Chat message:", msgs[index % msgs.length]);
+        // Replace with your bot framework's chat function
+        // Example:
+        // yourBot.chat(msgs[index % msgs.length])
         index++;
       }, delay);
     }
-  });
-
-  // Log chat
-  bot.on("message", (msg) => {
-    if (cfg.utils["chat-log"]) {
-      console.log("[CHAT] " + msg.toString());
-    }
-  });
-
-  // Auto reconnect
-  bot.on("end", () => {
+  },
+  disconnect: function() {
     console.log("Bot disconnected. Reconnecting...");
-    setTimeout(startBot, cfg.utils["auto-recconect-delay"]);
-  });
+    this.connected = false;
+    setTimeout(() => this.connect(), cfg.utils["auto-reconnect-delay"]);
+  }
+};
 
-  bot.on("error", (err) => {
-    console.log("Error:", err);
-  });
-}
-
-startBot();
+// Start the bot
+bot.connect();
